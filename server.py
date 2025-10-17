@@ -11,37 +11,39 @@ def chat():
 
     headers = {"Content-Type": "application/json"}
     api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        return jsonify({"reply": "Lỗi: Chưa cấu hình GEMINI_API_KEY."}), 500
 
-    # Tạo nội dung gửi đến Gemini
+    if not api_key:
+        return jsonify({"reply": "❌ Chưa cấu hình GEMINI_API_KEY"}), 500
+
     payload = {
         "contents": [
-            {"role": "user", "parts": [{"text": text}]}
+            {
+                "role": "user",
+                "parts": [{"text": text}]
+                + ([{"inline_data": {"mime_type": "image/png", "data": image}}] if image else [])
+            }
         ]
     }
 
-    if image:
-        payload["contents"][0]["parts"].append({
-            "inline_data": {"mime_type": "image/png", "data": image}
-        })
+    # ✅ Endpoint CHUẨN NHẤT (2025)
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
 
-    # Gọi API Gemini mới nhất
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
-    r = requests.post(url, headers=headers, json=payload)
+    try:
+        r = requests.post(url, headers=headers, json=payload)
+        if r.status_code != 200:
+            return jsonify({"reply": f"Lỗi API ({r.status_code}): {r.text}"}), 500
 
-    if r.status_code != 200:
-        return jsonify({"reply": f"Lỗi API ({r.status_code}): {r.text}"}), 500
-
-    data = r.json()
-    reply = (
-        data.get("candidates", [{}])[0]
+        res = r.json()
+        reply = (
+            res.get("candidates", [{}])[0]
             .get("content", {})
             .get("parts", [{}])[0]
-            .get("text", "Không có phản hồi.")
-    )
+            .get("text", "Không có phản hồi từ AI.")
+        )
+        return jsonify({"reply": reply})
+    except Exception as e:
+        return jsonify({"reply": f"Lỗi hệ thống: {str(e)}"}), 500
 
-    return jsonify({"reply": reply})
 
 if __name__ == "__main__":
     app.run(debug=True)
