@@ -1,0 +1,70 @@
+body {
+  background: #0e0e10;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  width: 400px;
+  background: #1e1e22;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+h1 {
+  background: linear-gradient(45deg, #00c6ff, #0072ff);
+  text-align: center;
+  margin: 0;
+  padding: 15px;
+  font-size: 22px;
+}
+
+#chatbox {
+  height: 400px;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.message {
+  margin: 10px 0;
+  line-height: 1.4;
+}
+
+.user {
+  color: #00c6ff;
+}
+
+.bot {
+  color: #00ff9f;
+}
+
+.input-area {
+  display: flex;
+  border-top: 1px solid #333;
+}
+
+#userInput {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  background: #121214;
+  color: white;
+}
+
+#sendBtn {
+  padding: 10px 15px;
+  background: #0072ff;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+#sendBtn:hover {
+  background: #00c6ff;
+}
