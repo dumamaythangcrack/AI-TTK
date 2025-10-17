@@ -1,21 +1,216 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gemini Chat</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vextra AI Chat</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+    :root {
+      --primary-color: #0d1117;
+      --secondary-color: #161b22;
+      --accent-color: #238636;
+      --text-color: #c9d1d9;
+      --ai-bubble-bg: #21262d;
+      --user-bubble-bg: #2ea043;
+      --border-color: #30363d;
+      --border-radius: 8px;
+      --shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      overflow: hidden;
+    }
+    .chat-container {
+      width: 95%;
+      max-width: 800px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--primary-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .chat-header {
+      background-color: var(--secondary-color);
+      color: #ffffff;
+      padding: 20px 25px;
+      font-size: 2em;
+      font-weight: 700;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .chat-messages {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: var(--primary-color);
+      scroll-behavior: smooth;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .chat-messages::-webkit-scrollbar { width: 8px; }
+    .chat-messages::-webkit-scrollbar-track {
+      background: var(--secondary-color);
+      border-radius: 10px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background-color: var(--accent-color);
+      border-radius: 10px;
+      border: 2px solid var(--secondary-color);
+    }
+    .message {
+      display: flex;
+      margin-bottom: 18px;
+      max-width: 75%;
+      position: relative;
+    }
+    .message.user {
+      justify-content: flex-end;
+      margin-left: auto;
+      padding-left: 20px;
+    }
+    .message.ai {
+      justify-content: flex-start;
+      margin-right: auto;
+      padding-right: 20px;
+    }
+    .avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .message.user .avatar {
+      order: 2;
+      margin-left: 10px;
+      background-color: #a371f7;
+    }
+    .message.ai .avatar {
+      order: 0;
+      margin-right: 10px;
+      background-color: #58a6ff;
+    }
+    .message-bubble {
+      padding: 14px 20px;
+      border-radius: var(--border-radius);
+      line-height: 1.6;
+      word-wrap: break-word;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    .message.user .message-bubble {
+      background-color: var(--user-bubble-bg);
+      color: #ffffff;
+      border-bottom-right-radius: 2px;
+    }
+    .message.ai .message-bubble {
+      background-color: var(--ai-bubble-bg);
+      color: var(--text-color);
+      border-bottom-left-radius: 2px;
+    }
+    .chat-input {
+      display: flex;
+      padding: 20px 25px;
+      border-top: 1px solid var(--border-color);
+      background-color: var(--secondary-color);
+    }
+    .chat-input input {
+      flex-grow: 1;
+      padding: 14px 18px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 1.05em;
+      outline: none;
+      background-color: var(--primary-color);
+      color: var(--text-color);
+    }
+    .chat-input input::placeholder { color: #8b949e; }
+    .chat-input button {
+      background-color: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 14px 25px;
+      border-radius: var(--border-radius);
+      margin-left: 15px;
+      cursor: pointer;
+      font-size: 1.05em;
+      font-weight: 700;
+      transition: 0.3s;
+    }
+    .chat-input button:hover {
+      background-color: #2ea043;
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>💬 Gemini Chat</h1>
-    <div id="chatbox"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Nhập tin nhắn của bạn...">
-      <button id="sendBtn">Gửi</button>
+  <div class="chat-container">
+    <div class="chat-header">Vextra AI Chat</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off" />
+      <button id="sendButton">Send</button>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+
+    function appendMessage(sender, text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', sender);
+      const avatarDiv = document.createElement('div');
+      avatarDiv.classList.add('avatar');
+      avatarDiv.textContent = sender === 'user' ? 'You' : 'AI';
+      messageDiv.appendChild(avatarDiv);
+      const bubble = document.createElement('div');
+      bubble.classList.add('message-bubble');
+      bubble.textContent = text;
+      messageDiv.appendChild(bubble);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+      appendMessage('user', text);
+      userInput.value = '';
+      appendMessage('ai', '...');
+      try {
+        const res = await fetch('/api/gemini', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text })
+        });
+        const data = await res.json();
+        chatMessages.lastChild.querySelector('.message-bubble').textContent = data.reply || 'No response';
+      } catch (e) {
+        chatMessages.lastChild.querySelector('.message-bubble').textContent = 'Error connecting to AI.';
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    appendMessage('ai', "Hello! I'm Vextra AI. How can I help you today?");
+  </script>
 </body>
 </html>
