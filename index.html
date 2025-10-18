@@ -3,64 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TTK AI Chat Nâng Cao</title>
+<title>TTK AI Chat</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
 <style>
-:root {
-  --bg-dark: #0d1117; --bg-light: #f5f5f5;
-  --text-dark: #c9d1d9; --text-light: #0d1117;
-  --accent: #00c896;
-  --bubble-ai-dark: #1e2228; --bubble-user-dark: #007c5c;
-  --bubble-ai-light: #e9e9eb; --bubble-user-light: #4bd37f;
-}
-body {
-  margin:0;height:100vh;font-family:"Poppins",sans-serif;
-  display:flex;justify-content:center;align-items:center;
-  transition:background 0.8s,color 0.8s;
-  background:var(--bg-dark);color:var(--text-dark);
-  overflow:hidden;
-}
-body::before {
-  content:"";position:absolute;width:250%;height:250%;
-  background:radial-gradient(circle at 20% 20%, #00ff8844, transparent),
-            radial-gradient(circle at 80% 80%, #00ffff22, transparent),
-            radial-gradient(circle at 60% 40%, #ff00aa33, transparent);
-  filter:blur(120px);animation:gradientMove 15s infinite alternate;
-  z-index:0;
-}
-@keyframes gradientMove{0%{transform:translate(0,0);}100%{transform:translate(-10%,-10%);}}
-.chat-container{position:relative;z-index:1;width:95%;max-width:850px;height:90vh;display:flex;flex-direction:column;border-radius:20px;backdrop-filter:blur(15px);background:rgba(13,17,23,0.7);box-shadow:0 8px 25px rgba(0,0,0,0.6);overflow:hidden;}
-.chat-header{background:rgba(22,27,34,0.85);padding:18px;text-align:center;font-size:1.6em;font-weight:600;border-bottom:1px solid #30363d;display:flex;justify-content:space-between;align-items:center;}
-.chat-header span{font-size:0.8em;opacity:0.7;}
-.mode-toggle{background:none;border:none;color:inherit;font-size:1.4em;cursor:pointer;transition:transform 0.3s;}
-.mode-toggle:hover{transform:rotate(25deg);}
-.chat-messages{flex:1;padding:20px;overflow-y:auto;scroll-behavior:smooth;}
-.chat-messages::-webkit-scrollbar{width:8px;}
-.chat-messages::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px;}
-.message{margin:10px 0;display:flex;animation:fadeIn 0.4s ease;}
-.message.user{justify-content:flex-end;}
-.message.ai{justify-content:flex-start;}
-.bubble{padding:12px 16px;border-radius:14px;max-width:75%;word-wrap:break-word;line-height:1.5;box-shadow:0 3px 6px rgba(0,0,0,0.2);white-space:pre-wrap;}
-.user .bubble{background:var(--bubble-user-dark);color:white;border-bottom-right-radius:4px;}
-.ai .bubble{background:var(--bubble-ai-dark);color:var(--text-dark);border-bottom-left-radius:4px;font-family:"Courier New", monospace;}
-.bubble img{margin:5px;border-radius:50%;max-width:100px;max-height:100px;object-fit:cover;cursor:pointer;}
-pre{background:rgba(0,0,0,0.2);padding:10px;border-radius:10px;overflow-x:auto;}
-table{border-collapse:collapse;width:100%;margin:5px 0;}
-table,th,td{border:1px solid var(--accent);}
-th,td{padding:5px;text-align:center;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-.typing{font-style:italic;opacity:0.7;}
-.chat-input{display:flex;align-items:center;padding:12px;background:rgba(22,27,34,0.85);border-top:1px solid #30363d;}
-input[type="text"]{flex:1;padding:12px;border:1px solid #30363d;border-radius:10px;background:rgba(13,17,23,0.6);color:var(--text-dark);font-size:1em;outline:none;}
-.file-input{display:none;}
-.icon-btn{background:none;border:none;font-size:1.5em;color:var(--accent);cursor:pointer;margin-right:10px;}
-.send-btn{padding:10px 18px;background:var(--accent);border:none;border-radius:10px;color:white;font-weight:bold;cursor:pointer;transition:background 0.3s;}
-.send-btn:hover{background:#00e6a4;}
-body.light{background:var(--bg-light);color:var(--text-light);}
-body.light .chat-container{background:rgba(255,255,255,0.9);}
-body.light .chat-header{background:rgba(245,245,245,0.9);}
-body.light .user .bubble{background:var(--bubble-user-light);}
-body.light .ai .bubble{background:var(--bubble-ai-light);color:var(--text-light);}
-body.light input{background:#fff;color:#000;}
+  :root {
+    --bg-dark: #0d1117;
+    --bg-light: #f5f5f5;
+    --text-dark: #c9d1d9;
+    --text-light: #0d1117;
+    --accent: #00c896;
+    --bubble-ai-dark: #1e2228;
+    --bubble-user-dark: #007c5c;
+    --bubble-ai-light: #e9e9eb;
+    --bubble-user-light: #4bd37f;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.8s, color 0.8s;
+    background: var(--bg-dark);
+    color: var(--text-dark);
+    overflow: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: absolute;
+    width: 250%;
+    height: 250%;
+    background: radial-gradient(circle at 20% 20%, #00ff8844, transparent),
+                radial-gradient(circle at 80% 80%, #00ffff22, transparent),
+                radial-gradient(circle at 60% 40%, #ff00aa33, transparent);
+    filter: blur(120px);
+    animation: gradientMove 15s infinite alternate;
+    z-index: 0;
+  }
+  @keyframes gradientMove {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-10%, -10%); }
+  }
+
+  .chat-container {
+    position: relative;
+    z-index: 1;
+    width: 95%;
+    max-width: 850px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    background: rgba(13, 17, 23, 0.7);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    overflow: hidden;
+  }
+
+  .chat-header {
+    background: rgba(22, 27, 34, 0.85);
+    padding: 18px;
+    font-size: 1.6em;
+    font-weight: 600;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-header span { font-size: 0.8em; opacity: 0.7; }
+
+  .mode-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.4em;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  .mode-toggle:hover { transform: rotate(25deg); }
+
+  .chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 8px; }
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
+  }
+
+  .message { margin: 10px 0; display: flex; animation: fadeIn 0.4s ease; }
+  .message.user { justify-content: flex-end; }
+  .message.ai { justify-content: flex-start; }
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 14px;
+    max-width: 75%;
+    word-wrap: break-word;
+    line-height: 1.5;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    white-space: pre-wrap;
+  }
+
+  .user .bubble { background: var(--bubble-user-dark); color: white; border-bottom-right-radius: 4px; }
+  .ai .bubble { background: var(--bubble-ai-dark); color: var(--text-dark); border-bottom-left-radius: 4px; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .typing { font-style: italic; opacity: 0.7; }
+
+  .chat-input {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: rgba(22,27,34,0.85);
+    border-top: 1px solid #30363d;
+    gap: 8px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    background: rgba(13,17,23,0.6);
+    color: var(--text-dark);
+    font-size: 1em;
+    outline: none;
+  }
+
+  .file-input { display: none; }
+
+  .image-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 5px;
+    border: 2px solid var(--accent);
+    position: relative;
+    cursor: pointer;
+  }
+  .image-preview:hover::after {
+    content: "✖";
+    color: red;
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: white;
+    border-radius: 50%;
+    font-size: 0.8em;
+    padding: 0 3px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .send-btn {
+    padding: 10px 18px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .send-btn:hover { background: #00e6a4; }
+
+  body.light { background: var(--bg-light); color: var(--text-light); }
+  body.light .chat-container { background: rgba(255,255,255,0.9); }
+  body.light .chat-header { background: rgba(245,245,245,0.9); }
+  body.light .user .bubble { background: var(--bubble-user-light); }
+  body.light .ai .bubble { background: var(--bubble-ai-light); color: var(--text-light); }
+  body.light input { background: #fff; color: #000; }
 </style>
 </head>
 <body>
@@ -80,8 +206,10 @@ body.light input{background:#fff;color:#000;}
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <script>
-const API_KEY = "AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU"; // tự động nhập
+const API_KEY = "AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU";
 const MODEL = "gemini-2.0-flash";
 const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
@@ -94,126 +222,103 @@ const fileInput = document.getElementById("fileInput");
 
 let selectedImages = [];
 
-// add message
-function addMessage(text,sender,isTyping=false,imgArray=[]){
-  const msg=document.createElement("div");
-  msg.className=`message ${sender}`;
-  const bubble=document.createElement("div");
-  bubble.className="bubble";
+function renderMessageContent(text) {
+  const container = document.createElement("div");
+  container.innerHTML = marked.parse(text);
+  container.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+  return container;
+}
 
-  imgArray.forEach((src,i)=>{
-    const img=document.createElement("img");
-    img.src=src;
-    img.title="Click để xóa";
-    img.onclick=()=>{bubble.removeChild(img); selectedImages.splice(i,1);}
+function addMessage(text, sender, isTyping = false, images = []) {
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+
+  images.forEach(src => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.className = "image-preview";
+    img.onclick = () => {
+      selectedImages = selectedImages.filter(s => s !== src);
+      img.remove();
+    };
     bubble.appendChild(img);
   });
 
-  const span=document.createElement("span");
-  span.innerHTML=text;
-  bubble.appendChild(span);
-
-  if(isTyping) bubble.classList.add("typing");
+  bubble.appendChild(renderMessageContent(text));
+  if (isTyping) bubble.classList.add("typing");
   msg.appendChild(bubble);
   messagesDiv.appendChild(msg);
-  messagesDiv.scrollTop=messagesDiv.scrollHeight;
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
   return msg;
 }
 
-// chọn file
-imgBtn.onclick=()=>fileInput.click();
-fileInput.onchange=e=>{
-  const files=e.target.files;
-  for(let i=0;i<files.length;i++){
-    const reader=new FileReader();
-    reader.onload=()=>{
+imgBtn.onclick = () => fileInput.click();
+
+fileInput.onchange = e => {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = () => {
       selectedImages.push(reader.result);
-      addMessage("📷 Ảnh đã chọn:","user",false,[reader.result]);
+      addMessage("", "user", false, [reader.result]);
     };
-    reader.readAsDataURL(files[i]);
-  }
+    reader.readAsDataURL(file);
+  });
 };
 
-// paste ảnh clipboard
-document.addEventListener("paste",e=>{
-  const items=e.clipboardData?.items;
-  if(!items) return;
-  for(let i=0;i<items.length;i++){
-    const item=items[i];
-    if(item.type.indexOf("image")!==-1){
-      const blob=item.getAsFile();
-      const reader=new FileReader();
-      reader.onload=()=>{
+document.addEventListener("paste", e => {
+  const items = e.clipboardData.items;
+  for (let i=0;i<items.length;i++) {
+    if (items[i].type.indexOf("image") !== -1) {
+      const file = items[i].getAsFile();
+      const reader = new FileReader();
+      reader.onload = () => {
         selectedImages.push(reader.result);
-        addMessage("📋 Ảnh clipboard:","user",false,[reader.result]);
+        addMessage("", "user", false, [reader.result]);
       };
-      reader.readAsDataURL(blob);
+      reader.readAsDataURL(file);
     }
   }
 });
 
-// drag & drop
-messagesDiv.addEventListener("dragover",e=>{e.preventDefault();});
-messagesDiv.addEventListener("drop",e=>{
-  e.preventDefault();
-  const files=e.dataTransfer.files;
-  for(let i=0;i<files.length;i++){
-    const reader=new FileReader();
-    reader.onload=()=>{
-      selectedImages.push(reader.result);
-      addMessage("📂 Ảnh drop:","user",false,[reader.result]);
-    };
-    reader.readAsDataURL(files[i]);
-  }
-});
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text && selectedImages.length === 0) return;
 
-// send
-async function sendMessage(){
-  const text=input.value.trim();
-  if(!text && selectedImages.length===0) return;
-  addMessage(text||"Gửi ảnh","user",false,selectedImages);
-  input.value="";
-  const typingMsg=addMessage("TTK AI đang gõ...","ai",true);
-  try{
-    const body={contents:[{parts:[
-      ...selectedImages.map(img=>({inline_data:{mime_type:"image/png",data:img.split(",")[1]}})),
-      {text}
-    ]}]};
-    const res=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    const data=await res.json();
+  addMessage(text || "📷 Ảnh", "user", false, selectedImages);
+  input.value = "";
+  const typingMsg = addMessage("TTK AI đang gõ...", "ai", true);
+
+  try {
+    const parts = [];
+    selectedImages.forEach(img => parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
+    if(text) parts.push({text});
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({contents:[{parts}]})
+    });
+
+    const data = await res.json();
     typingMsg.remove();
-    let reply=data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
-    // markdown + link + code + table
-    reply=reply.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
-               .replace(/\*(.*?)\*/g,'<i>$1</i>')
-               .replace(/^- /gm,'• ')
-               .replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank">$1</a>')
-               .replace(/```([\s\S]*?)```/g,'<pre><code>$1</code></pre>')
-               .replace(/\|\|([\s\S]*?)\|\|/g,(m,p)=>{
-                 const cols=p.split("|").slice(1);
-                 let html="<table><tr>"+cols.map(c=>`<td>${c}</td>`).join("")+"</tr></table>";
-                 return html;
-               });
-    addMessage(reply,"ai");
-  }catch(err){
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
+    addMessage(reply, "ai");
+  } catch(err) {
     typingMsg.remove();
-    addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.","ai");
+    addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.", "ai");
   }
-  selectedImages=[];
+
+  selectedImages = [];
 }
 
-sendBtn.onclick=sendMessage;
-input.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
-modeToggle.onclick=()=>document.body.classList.toggle("light");
+sendBtn.onclick = sendMessage;
+input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+modeToggle.onclick = () => document.body.classList.toggle("light");
 
-// Markdown autocomplete gợi ý
-input.addEventListener("input",e=>{
-  const val=input.value;
-  if(val.endsWith("**")) input.value=val+" "; // ví dụ gợi ý in đậm
-});
-
-// greeting
-addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!","ai");
+addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!", "ai");
 </script>
 </body>
 </html>
