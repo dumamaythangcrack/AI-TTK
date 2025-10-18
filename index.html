@@ -3,322 +3,326 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TTK AI Chat</title>
+<title>TTK AI Chat - Cyberpunk</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
 <style>
-  :root {
-    --bg-dark: #0d1117;
-    --bg-light: #f5f5f5;
-    --text-dark: #c9d1d9;
-    --text-light: #0d1117;
-    --accent: #00c896;
-    --bubble-ai-dark: #1e2228;
-    --bubble-user-dark: #007c5c;
-    --bubble-ai-light: #e9e9eb;
-    --bubble-user-light: #4bd37f;
-  }
+:root{
+  --bg-dark:#0d1117;
+  --bg-light:#f5f5f5;
+  --text-dark:#c9d1d9;
+  --text-light:#0d1117;
+  --accent:#00c896;
+  --bubble-ai-dark:#1e2228;
+  --bubble-user-dark:#007c5c;
+  --bubble-ai-light:#e9e9eb;
+  --bubble-user-light:#4bd37f;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:"Poppins",sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-dark);
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+  transition:0.6s;
+  perspective:1000px;
+}
 
-  body {
-    margin: 0;
-    height: 100vh;
-    font-family: "Poppins", sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background 0.8s, color 0.8s;
-    background: var(--bg-dark);
-    color: var(--text-dark);
-    overflow: hidden;
-  }
+/* Hình nền gradient 3D tương tác theo chuột */
+body::before{
+  content:"";
+  position:absolute;
+  width:300%;
+  height:300%;
+  background: radial-gradient(circle at 30% 30%, #00ff8844, transparent),
+              radial-gradient(circle at 70% 70%, #00ffff33, transparent),
+              radial-gradient(circle at 50% 50%, #ff00aa33, transparent),
+              linear-gradient(45deg, #ff008844, #00ff8844, #0088ff33);
+  filter: blur(180px);
+  transform: translate3d(0,0,0);
+  transition: transform 0.1s;
+  z-index:0;
+}
 
-  body::before {
-    content: "";
-    position: absolute;
-    width: 250%;
-    height: 250%;
-    background: radial-gradient(circle at 20% 20%, #00ff8844, transparent),
-                radial-gradient(circle at 80% 80%, #00ffff22, transparent),
-                radial-gradient(circle at 60% 40%, #ff00aa33, transparent);
-    filter: blur(120px);
-    animation: gradientMove 15s infinite alternate;
-    z-index: 0;
-  }
-  @keyframes gradientMove {
-    0% { transform: translate(0,0); }
-    100% { transform: translate(-10%, -10%); }
-  }
+/* Header */
+header{
+  padding:15px 25px;
+  background: rgba(22,27,34,0.9);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #30363d;
+  z-index:1;
+  position:relative;
+}
+header span{font-size:0.9em;opacity:0.7;}
+.mode-toggle{
+  background:none;
+  border:none;
+  color:inherit;
+  font-size:1.5em;
+  cursor:pointer;
+  transition:0.3s;
+}
+.mode-toggle:hover{transform:rotate(25deg);}
 
-  .chat-container {
-    position: relative;
-    z-index: 1;
-    width: 95%;
-    max-width: 850px;
-    height: 90vh;
-    display: flex;
-    flex-direction: column;
-    border-radius: 20px;
-    backdrop-filter: blur(15px);
-    background: rgba(13, 17, 23, 0.7);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-    overflow: hidden;
-  }
+/* Messages */
+#messages{
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  scroll-behavior:smooth;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:1;
+  position:relative;
+}
+#messages::-webkit-scrollbar{width:8px;}
+#messages::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px;}
 
-  .chat-header {
-    background: rgba(22, 27, 34, 0.85);
-    padding: 18px;
-    font-size: 1.6em;
-    font-weight: 600;
-    border-bottom: 1px solid #30363d;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .chat-header span { font-size: 0.8em; opacity: 0.7; }
+/* Bubble + animation + Cyberpunk shine */
+.message{
+  display:flex;
+  max-width:75%;
+  opacity:0;
+  transform:translateY(30px);
+  animation:slideUp 0.5s forwards;
+  position:relative;
+  transition:0.3s;
+}
+.message.user{align-self:flex-end;justify-content:flex-end;}
+.message.ai{align-self:flex-start;justify-content:flex-start;}
+.bubble{
+  padding:14px 18px;
+  border-radius:14px;
+  word-wrap:break-word;
+  line-height:1.5;
+  white-space:pre-wrap;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  backdrop-filter:blur(10px);
+  position:relative;
+  transition:0.2s, box-shadow 0.2s, transform 0.2s;
+  overflow:hidden;
+}
+.user .bubble{background:var(--bubble-user-dark);color:#fff;}
+.ai .bubble{background:var(--bubble-ai-dark);color:var(--text-dark);}
+.bubble::before{
+  content:"";
+  position:absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  pointer-events:none;
+  background: radial-gradient(circle at 50% 50%, rgba(0,255,255,0.15), transparent 60%);
+  mix-blend-mode:screen;
+  transform:translate(0,0);
+  transition: transform 0.1s;
+}
+.bubble.glow{
+  box-shadow: 0 0 15px rgba(0,255,255,0.5),
+              0 0 30px rgba(0,255,255,0.3),
+              0 0 45px rgba(0,255,255,0.2);
+  transform: scale(1.03);
+}
 
-  .mode-toggle {
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: 1.4em;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-  .mode-toggle:hover { transform: rotate(25deg); }
+.typing{font-style:italic;opacity:0.7;}
+@keyframes slideUp{to{opacity:1;transform:translateY(0);}}
 
-  .chat-messages {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-  }
-  .chat-messages::-webkit-scrollbar { width: 8px; }
-  .chat-messages::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border-radius: 10px;
-  }
+/* Avatar */
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  margin-right:10px;
+  flex-shrink:0;
+  box-shadow: 0 4px 15px rgba(0,255,136,0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.message.ai .avatar{background:#00c896 url('https://i.ibb.co/7pF0g1R/robot.png') center/cover no-repeat;}
+.message.user .avatar{background:#007c5c url('https://i.ibb.co/Y0w6nLc/user.png') center/cover no-repeat;}
+.message.ai .avatar:hover,
+.message.user .avatar:hover{
+  transform: scale(1.15) rotate(-5deg);
+  box-shadow: 0 6px 25px rgba(0,255,136,0.7);
+}
 
-  .message { margin: 10px 0; display: flex; animation: fadeIn 0.4s ease; }
-  .message.user { justify-content: flex-end; }
-  .message.ai { justify-content: flex-start; }
+/* Chat input */
+.chat-input{
+  display:flex;
+  padding:14px;
+  gap:10px;
+  background: rgba(22,27,34,0.95);
+  border-top:1px solid #30363d;
+  z-index:1;
+  position:relative;
+}
+.chat-input input[type="text"]{
+  flex:1;
+  padding:14px;
+  border-radius:10px;
+  border:1px solid #30363d;
+  background: rgba(13,17,23,0.7);
+  color: var(--text-dark);
+  font-size:1em;
+  outline:none;
+  transition:0.3s;
+}
+.send-btn{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background: var(--accent);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+.send-btn:hover{background:#00e6a4;}
+.icon-btn{background:none;border:none;font-size:1.5em;color:var(--accent);cursor:pointer;}
+.file-input{display:none;}
+.image-preview{
+  width:70px;height:70px;border-radius:10px;object-fit:cover;border:2px solid var(--accent);cursor:pointer;position:relative;
+}
+.image-preview:hover::after{
+  content:"✖";position:absolute;top:-6px;right:-6px;background:white;color:red;border-radius:50%;font-size:0.8em;padding:0 3px;
+}
 
-  .bubble {
-    padding: 12px 16px;
-    border-radius: 14px;
-    max-width: 75%;
-    word-wrap: break-word;
-    line-height: 1.5;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-    white-space: pre-wrap;
-  }
-
-  .user .bubble { background: var(--bubble-user-dark); color: white; border-bottom-right-radius: 4px; }
-  .ai .bubble { background: var(--bubble-ai-dark); color: var(--text-dark); border-bottom-left-radius: 4px; }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-  .typing { font-style: italic; opacity: 0.7; }
-
-  .chat-input {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    background: rgba(22,27,34,0.85);
-    border-top: 1px solid #30363d;
-    gap: 8px;
-  }
-
-  input[type="text"] {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #30363d;
-    border-radius: 10px;
-    background: rgba(13,17,23,0.6);
-    color: var(--text-dark);
-    font-size: 1em;
-    outline: none;
-  }
-
-  .file-input { display: none; }
-
-  .image-preview {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 5px;
-    border: 2px solid var(--accent);
-    position: relative;
-    cursor: pointer;
-  }
-  .image-preview:hover::after {
-    content: "✖";
-    color: red;
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: white;
-    border-radius: 50%;
-    font-size: 0.8em;
-    padding: 0 3px;
-  }
-
-  .icon-btn {
-    background: none;
-    border: none;
-    font-size: 1.5em;
-    color: var(--accent);
-    cursor: pointer;
-  }
-
-  .send-btn {
-    padding: 10px 18px;
-    background: var(--accent);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  .send-btn:hover { background: #00e6a4; }
-
-  body.light { background: var(--bg-light); color: var(--text-light); }
-  body.light .chat-container { background: rgba(255,255,255,0.9); }
-  body.light .chat-header { background: rgba(245,245,245,0.9); }
-  body.light .user .bubble { background: var(--bubble-user-light); }
-  body.light .ai .bubble { background: var(--bubble-ai-light); color: var(--text-light); }
-  body.light input { background: #fff; color: #000; }
+body.light{background:var(--bg-light);color:var(--text-light);}
+body.light .ai .bubble{background:var(--bubble-ai-light);color:var(--text-light);}
+body.light .user .bubble{background:var(--bubble-user-light);}
+body.light .chat-input input{background:#fff;color:#000;}
 </style>
 </head>
 <body>
-<div class="chat-container">
-  <div class="chat-header">
-    🤖 TTK AI <span>Dev by Trần Tuấn Khang</span>
-    <button class="mode-toggle" id="modeToggle">🌓</button>
-  </div>
-
-  <div id="messages" class="chat-messages"></div>
-
-  <div class="chat-input">
-    <button class="icon-btn" id="imgBtn">🖼️</button>
-    <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
-    <input id="input" type="text" placeholder="Nhập tin nhắn hoặc mô tả ảnh...">
-    <button id="send" class="send-btn">Gửi</button>
-  </div>
+<header>
+  🤖 TTK AI <span>Dev by Trần Tuấn Khang</span>
+  <button class="mode-toggle" id="modeToggle">🌓</button>
+</header>
+<div id="messages"></div>
+<div class="chat-input">
+  <button class="icon-btn" id="imgBtn">🖼️</button>
+  <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+  <input type="text" id="input" placeholder="Nhập tin nhắn hoặc mô tả ảnh...">
+  <button id="send" class="send-btn">Gửi</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <script>
-const API_KEY = "AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU";
-const MODEL = "gemini-2.0-flash";
-const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const API_KEY="AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU";
+const MODEL="gemini-2.0-flash";
+const endpoint=`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
-const messagesDiv = document.getElementById("messages");
-const input = document.getElementById("input");
-const sendBtn = document.getElementById("send");
-const modeToggle = document.getElementById("modeToggle");
-const imgBtn = document.getElementById("imgBtn");
-const fileInput = document.getElementById("fileInput");
+const messagesDiv=document.getElementById("messages");
+const input=document.getElementById("input");
+const sendBtn=document.getElementById("send");
+const modeToggle=document.getElementById("modeToggle");
+const imgBtn=document.getElementById("imgBtn");
+const fileInput=document.getElementById("fileInput");
+let selectedImages=[];
 
-let selectedImages = [];
+// Gradient 3D, bubble shine & glow theo chuột
+document.addEventListener("mousemove", e=>{
+  const x = e.clientX/window.innerWidth*30;
+  const y = e.clientY/window.innerHeight*30;
+  document.body.style.setProperty('--bg-offset-x', `${x}px`);
+  document.body.style.setProperty('--bg-offset-y', `${y}px`);
+  document.body.querySelector('::before')?.style && (document.body.querySelector('::before').style.transform = `translate3d(${-x}px, ${-y}px,0)`);
 
-function renderMessageContent(text) {
-  const container = document.createElement("div");
-  container.innerHTML = marked.parse(text);
-  container.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+  document.querySelectorAll('.bubble').forEach(b=>{
+    const rect=b.getBoundingClientRect();
+    const cx=e.clientX-(rect.left+rect.width/2);
+    const cy=e.clientY-(rect.top+rect.height/2);
+    const dist=Math.sqrt(cx*cx+cy*cy);
+    if(dist<150){b.classList.add('glow');} else {b.classList.remove('glow');}
+    b.style.setProperty('--shineX', `${cx}px`);
+    b.style.setProperty('--shineY', `${cy}px`);
+    b.querySelector('::before')?.style && (b.querySelector('::before').style.transform=`translate(${cx*0.05}px,${cy*0.05}px)`);
+  });
+});
+
+function renderMessageContent(text){
+  const container=document.createElement("div");
+  container.innerHTML=marked.parse(text);
+  container.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
   return container;
 }
 
-function addMessage(text, sender, isTyping = false, images = []) {
-  const msg = document.createElement("div");
-  msg.className = `message ${sender}`;
-  const bubble = document.createElement("div");
-  bubble.className = "bubble";
+function addMessage(text,sender,isTyping=false,images=[]){
+  const msg=document.createElement("div");
+  msg.className=`message ${sender}`;
+  const avatar=document.createElement("div");
+  avatar.className="avatar";
+  msg.appendChild(avatar);
+  const bubble=document.createElement("div");
+  bubble.className="bubble";
 
-  images.forEach(src => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.className = "image-preview";
-    img.onclick = () => {
-      selectedImages = selectedImages.filter(s => s !== src);
-      img.remove();
-    };
+  images.forEach(src=>{
+    const img=document.createElement("img");
+    img.src=src; img.className="image-preview";
+    img.onclick=()=>{selectedImages=selectedImages.filter(s=>s!==src); img.remove();}
     bubble.appendChild(img);
   });
-
   bubble.appendChild(renderMessageContent(text));
-  if (isTyping) bubble.classList.add("typing");
+  if(isTyping) bubble.classList.add("typing");
   msg.appendChild(bubble);
   messagesDiv.appendChild(msg);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  messagesDiv.scrollTop=messagesDiv.scrollHeight;
   return msg;
 }
 
-imgBtn.onclick = () => fileInput.click();
-
-fileInput.onchange = e => {
-  const files = Array.from(e.target.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      selectedImages.push(reader.result);
-      addMessage("", "user", false, [reader.result]);
-    };
+imgBtn.onclick=()=>fileInput.click();
+fileInput.onchange=e=>{
+  Array.from(e.target.files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=()=>{selectedImages.push(reader.result); addMessage("", "user", false,[reader.result]);};
     reader.readAsDataURL(file);
   });
 };
-
-document.addEventListener("paste", e => {
-  const items = e.clipboardData.items;
-  for (let i=0;i<items.length;i++) {
-    if (items[i].type.indexOf("image") !== -1) {
-      const file = items[i].getAsFile();
-      const reader = new FileReader();
-      reader.onload = () => {
-        selectedImages.push(reader.result);
-        addMessage("", "user", false, [reader.result]);
-      };
+document.addEventListener("paste",e=>{
+  for(let i=0;i<e.clipboardData.items.length;i++){
+    if(e.clipboardData.items[i].type.indexOf("image")!==-1){
+      const file=e.clipboardData.items[i].getAsFile();
+      const reader=new FileReader();
+      reader.onload=()=>{selectedImages.push(reader.result); addMessage("", "user", false,[reader.result]);};
       reader.readAsDataURL(file);
     }
   }
 });
 
-async function sendMessage() {
-  const text = input.value.trim();
-  if (!text && selectedImages.length === 0) return;
-
-  addMessage(text || "📷 Ảnh", "user", false, selectedImages);
-  input.value = "";
-  const typingMsg = addMessage("TTK AI đang gõ...", "ai", true);
-
-  try {
-    const parts = [];
-    selectedImages.forEach(img => parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
+async function sendMessage(){
+  const text=input.value.trim();
+  if(!text && selectedImages.length===0) return;
+  addMessage(text||"📷 Ảnh","user",false,selectedImages);
+  input.value="";
+  const typingMsg=addMessage("TTK AI đang gõ...","ai",true);
+  try{
+    const parts=[];
+    selectedImages.forEach(img=>parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
     if(text) parts.push({text});
-
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({contents:[{parts}]})
-    });
-
-    const data = await res.json();
+    const res=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts}]})});
+    const data=await res.json();
     typingMsg.remove();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
-    addMessage(reply, "ai");
-  } catch(err) {
+    const reply=data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
+    addMessage(reply,"ai");
+  }catch(err){
     typingMsg.remove();
-    addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.", "ai");
+    addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.","ai");
   }
-
-  selectedImages = [];
+  selectedImages=[];
 }
 
-sendBtn.onclick = sendMessage;
-input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
-modeToggle.onclick = () => document.body.classList.toggle("light");
+sendBtn.onclick=sendMessage;
+input.addEventListener("keypress",e=>{if(e.key==="Enter") sendMessage();});
+modeToggle.onclick=()=>document.body.classList.toggle("light");
 
-addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!", "ai");
+addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!","ai");
 </script>
 </body>
 </html>
