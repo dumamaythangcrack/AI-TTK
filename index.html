@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TTK AI Chat - Glassmorphism Pro</title>
+<title>TTK AI Chat V2.1 </title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg-dark:#0a0a14;
-  --bg-light:#f5f5f5;
-  --text-dark:#e0f7ff;
-  --text-light:#0d1117;
-  --accent:#33ffd6;
-  --accent-hover:#33e6b8;
-  --accent2:#d166ff;
-  --bubble-ai-dark:rgba(20,25,35,0.75);
-  --bubble-user-dark:rgba(0,95,95,0.55);
-  --bubble-ai-light:rgba(233,233,235,0.85);
-  --bubble-user-light:rgba(75,211,127,0.8);
+  --bg-dark:#0a0a0f;
+  --bg-light:#f9f9f9;
+  --text-dark:#e0e0e0;
+  --text-light:#111;
+  --accent:#a855f7;
+  --accent-hover:#b366ff;
+  --bubble-ai-dark:rgba(30,30,30,0.75);
+  --bubble-user-dark:rgba(50,50,50,0.55);
+  --bubble-ai-light:rgba(245,245,245,0.85);
+  --bubble-user-light:rgba(220,220,220,0.8);
+  --modal-bg: rgba(20,20,20,0.7);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
-  font-family:'Share Tech Mono','Orbitron',monospace,sans-serif;
+  font-family:'Inter',sans-serif;
   background: var(--bg-dark);
   color: var(--text-dark);
   height:100vh;
@@ -30,34 +30,27 @@ body{
   flex-direction:column;
   overflow:hidden;
   position:relative;
-  transition:0.5s background ease;
+  transition:0.5s background ease,color 0.5s;
 }
-
-/* Background subtle gradient + soft noise */
 body::before{
   content:"";
   position:absolute;
-  width:300%;
-  height:300%;
-  background: radial-gradient(circle at 30% 30%, #33ffd644, transparent),
-              radial-gradient(circle at 70% 70%, #d166ff33, transparent),
-              radial-gradient(circle at 50% 50%, #33fff033, transparent),
-              linear-gradient(45deg, #ff00ff11, #00ffcc11, #0088ff11);
-  filter: blur(200px) contrast(1.1);
+  width:100%;
+  height:100%;
+  background: rgba(15,15,15,0.4);
+  filter: blur(50px);
   transform: translate3d(0,0,0);
   z-index:0;
 }
-
-/* Header Glassmorphism */
 header{
   padding:15px 25px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background: rgba(15,15,25,0.6);
-  backdrop-filter: blur(16px) saturate(180%);
-  border-radius:20px;
-  box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  background: rgba(20,20,20,0.5);
+  backdrop-filter: blur(12px);
+  border-radius:12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
   position:relative;
   z-index:1;
   transition: all 0.4s ease;
@@ -65,21 +58,20 @@ header{
 header span{
   font-size:0.9em;
   opacity:0.7;
-  color:#ccc;
+  color: var(--text-dark);
 }
-.mode-toggle{
+.mode-toggle,.info-btn{
   background:none;
   border:none;
   color:inherit;
   font-size:1.5em;
   cursor:pointer;
-  transition:0.3s;
+  transition:all 0.3s ease;
+  margin-left:10px;
 }
-.mode-toggle:hover{
-  transform:scale(1.1);
+.mode-toggle:hover,.info-btn:hover{
+  transform:scale(1.05);
 }
-
-/* Messages container */
 #messages{
   flex:1;
   overflow-y:auto;
@@ -91,30 +83,22 @@ header span{
   position:relative;
   scroll-behavior:smooth;
 }
-#messages::-webkit-scrollbar{width:10px;}
+#messages::-webkit-scrollbar{width:8px;}
 #messages::-webkit-scrollbar-track{background:transparent;}
 #messages::-webkit-scrollbar-thumb{
-  background: linear-gradient(45deg,var(--accent),var(--accent2));
+  background: var(--accent);
   border-radius:8px;
 }
-
-/* Message bubble Glassmorphism */
 .message{
   display:flex;
   max-width:75%;
   opacity:0;
   transform:translateY(20px) scale(0.95);
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  animation: slide-up 0.5s ease-out forwards;
   position:relative;
-}
-.message.show{
-  opacity:1;
-  transform:translateY(0) scale(1);
 }
 .message.user{align-self:flex-end;}
 .message.ai{align-self:flex-start;}
-
-/* AI Bubble - Data Display Frame */
 .bubble{
   padding:16px 20px;
   word-wrap:break-word;
@@ -123,92 +107,74 @@ header span{
   display:flex;
   flex-direction:column;
   gap:8px;
-  backdrop-filter:blur(16px) saturate(180%);
+  backdrop-filter:blur(12px);
   background: var(--bubble-ai-dark);
-  border-radius:16px;
+  border-radius:12px;
   position:relative;
-  transition:0.3s, box-shadow 0.3s;
+  transition:0.3s;
   overflow:hidden;
-  text-shadow:0 0 2px #33ffd6;
 }
 .user .bubble{
   background:var(--bubble-user-dark);
-  color:#fff;
+  color: var(--text-dark);
 }
-
-/* --- AI Bubble Specific --- */
 .ai .bubble{
   padding:20px 25px;
-  border-radius:16px 16px 16px 4px; /* góc trên trái hơi nhọn */
-  background: linear-gradient(135deg, rgba(20,25,35,0.8), rgba(30,35,50,0.85));
-  box-shadow:
-    0 0 10px var(--accent),
-    0 0 25px var(--accent2),
-    inset 0 0 5px rgba(255,255,255,0.05);
-  border-left: 4px solid var(--accent);
+  border-radius:16px 16px 16px 4px;
+  background: var(--bubble-ai-dark);
+  border-left: 3px solid var(--accent);
 }
-
-/* Code/Data Display inside AI bubble */
 .ai .bubble pre{
-  background: rgba(10,10,20,0.7);
-  border-left: 4px solid var(--accent2);
-  border-radius:8px;
-  padding:12px 16px;
+  background: rgba(25,25,25,0.7);
+  border-left: 2px solid #555;
+  border-radius:6px;
+  padding:10px 14px;
   overflow-x:auto;
   font-family:'Share Tech Mono','Orbitron',monospace;
-  color:#fff;
-  margin:6px 0;
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  color: var(--text-dark);
 }
 .ai .bubble code{
-  background: rgba(0,0,0,0.2);
+  background: rgba(50,50,50,0.3);
   border-radius:4px;
   padding:2px 6px;
   font-family:'Share Tech Mono','Orbitron',monospace;
-  color:#33ffd6;
+  color:var(--accent);
 }
-
-/* Bubble shine / subtle effect */
 .bubble::before{
   content:"";
   position:absolute;
   top:0; left:0;
   width:100%; height:100%;
   pointer-events:none;
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05), transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02), transparent 70%);
   mix-blend-mode:screen;
   transition: transform 0.2s ease;
 }
 .bubble.glow{
-  box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent2);
-  transform: scale(1.03);
+  box-shadow: 0 0 6px var(--accent, rgba(168,85,247,0.5));
+  transform: scale(1.01);
 }
-
-/* Avatar */
 .avatar{
   width:42px;
   height:42px;
   border-radius:50%;
   margin-right:10px;
   flex-shrink:0;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s;
 }
-.message.ai .avatar{background:#33ffd6 url('https://i.ibb.co/dsCLWn26/images.jpg') center/cover no-repeat;}
-.message.user .avatar{background:#005f5f url('https://i.ibb.co/PsYbWjjR/png-clipart-aspria-fitness-computer-icons-user-my-account-icon-miscellaneous-monochrome-thumbnail.png') center/cover no-repeat;}
+.message.ai .avatar{background:#a855f7 url('https://i.ibb.co/dsCLWn26/images.jpg') center/cover no-repeat;}
+.message.user .avatar{background:#555 url('https://i.ibb.co/PsYbWjjR/png-clipart-aspria-fitness-computer-icons-user-my-account-icon-miscellaneous-monochrome-thumbnail.png') center/cover no-repeat;}
 .message.ai .avatar:hover,
 .message.user .avatar:hover{
-  transform: scale(1.2);
-  box-shadow: 0 4px 25px var(--accent2);
+  transform: scale(1.1);
 }
-
-/* Chat input Glassmorphism */
 .chat-input{
   display:flex;
   padding:14px;
   gap:10px;
-  background: rgba(15,15,25,0.5);
-  backdrop-filter: blur(16px) saturate(180%);
-  border-radius:20px;
+  background: rgba(20,20,20,0.5);
+  backdrop-filter: blur(12px);
+  border-radius:16px;
   position:relative;
   z-index:1;
 }
@@ -217,55 +183,122 @@ header span{
   padding:14px;
   border-radius:12px;
   border:none;
-  background: rgba(255,255,255,0.1);
-  color: #e0f7ff;
-  font-family:'Share Tech Mono','Orbitron',monospace;
+  background: rgba(255,255,255,0.08);
+  color: var(--text-dark);
+  font-family:'Inter',sans-serif;
   font-size:1em;
   outline:none;
-  transition:0.3s, box-shadow 0.3s;
+  transition:0.3s;
 }
 .chat-input input[type="text"]:focus{
-  box-shadow: 0 0 12px var(--accent), 0 0 20px var(--accent2);
-  background: rgba(255,255,255,0.15);
+  box-shadow: 0 0 6px var(--accent);
+  background: rgba(255,255,255,0.12);
 }
 .send-btn{
   padding:12px 22px;
   border:none;
   border-radius:12px;
-  background: linear-gradient(135deg,var(--accent),var(--accent-hover));
-  color:#0a0a0f;
+  background: var(--accent);
+  color:#fff;
   font-weight:bold;
   cursor:pointer;
   font-family:'Orbitron','Share Tech Mono',monospace;
-  transition:0.3s, box-shadow 0.3s;
-  text-shadow:0 0 2px #33ffd6;
+  transition:0.3s;
 }
 .send-btn:hover{
-  box-shadow:0 0 15px var(--accent),0 0 25px var(--accent2);
+  box-shadow:0 0 6px var(--accent);
 }
 .icon-btn{
-  background:none;border:none;font-size:1.5em;color:var(--accent);cursor:pointer;transition:0.3s;}
-.icon-btn:hover{text-shadow:0 0 12px var(--accent),0 0 20px var(--accent2);}
+  background:none;border:none;font-size:1.5em;color:var(--accent);cursor:pointer;transition:0.3s;
+}
+.icon-btn:hover{
+  text-shadow:0 0 6px var(--accent);
+}
 .file-input{display:none;}
 .image-preview{
   width:70px;height:70px;border-radius:16px;object-fit:cover;border:2px solid var(--accent);cursor:pointer;position:relative;
-  transition:0.3s, box-shadow 0.3s;
+  transition:0.3s;
 }
 .image-preview:hover{
-  box-shadow:0 0 15px var(--accent),0 0 25px var(--accent2);
+  box-shadow:0 0 6px var(--accent);
 }
 
 /* Light mode */
-body.light{background:var(--bg-light);color:var(--text-light);}
+body.light{
+  background:var(--bg-light);
+  color:var(--text-light);
+}
 body.light .ai .bubble{background:var(--bubble-ai-light);color:var(--text-light);}
 body.light .user .bubble{background:var(--bubble-user-light);}
-body.light .chat-input input{background:rgba(255,255,255,0.8);color:#000;}
+body.light .chat-input input{background:rgba(255,255,255,0.8);color:#111;}
+
+/* Slide-up animation */
+@keyframes slide-up{
+  0%{opacity:0;transform:translateY(20px) scale(0.95);}
+  100%{opacity:1;transform:translateY(0) scale(1);}
+}
+
+/* Spinner animation */
+.ai-spinner{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.ai-spinner .spinner{
+  width:20px;
+  height:20px;
+  border:3px solid rgba(255,255,255,0.2);
+  border-top:3px solid var(--accent);
+  border-radius:50%;
+  animation: spin 1s linear infinite;
+}
+.ai-spinner span{
+  font-size:0.85em;
+  color: var(--text-dark);
+}
+
+/* Keyframes spin */
+@keyframes spin{
+  0%{transform:rotate(0deg);}
+  100%{transform:rotate(360deg);}
+}
+
+/* Modal */
+#infoModal{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background: rgba(0,0,0,0.5);
+  display:flex;justify-content:center;align-items:center;
+  opacity:0;pointer-events:none;transition:0.3s;
+  z-index:10;
+}
+#infoModal.show{
+  opacity:1;pointer-events:auto;
+}
+#infoModal .modal-content{
+  background: var(--modal-bg);
+  backdrop-filter: blur(12px);
+  padding:20px 30px;
+  border-radius:16px;
+  max-width:400px;
+  text-align:center;
+  color: var(--text-dark);
+  position:relative;
+}
+#infoModal .modal-content h2{margin-bottom:10px;font-family:'Orbitron',monospace;}
+#infoModal .modal-content p{margin:6px 0;}
+#infoModal .close-btn{
+  position:absolute;top:10px;right:15px;
+  background:none;border:none;color:var(--text-dark);font-size:1.5em;cursor:pointer;
+}
 </style>
 </head>
 <body>
 <header>
   🤖 TTK AI <span>Dev by Trần Tuấn Khang</span>
-  <button class="mode-toggle" id="modeToggle">🌓</button>
+  <div>
+    <button class="mode-toggle" id="modeToggle">🌓</button>
+    <button class="info-btn" id="infoBtn">ℹ️</button>
+  </div>
 </header>
 <div id="messages"></div>
 <div class="chat-input">
@@ -275,10 +308,20 @@ body.light .chat-input input{background:rgba(255,255,255,0.8);color:#000;}
   <button id="send" class="send-btn">Gửi</button>
 </div>
 
+<!-- Info Modal -->
+<div id="infoModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeModal">&times;</button>
+    <h2>TTK AI V2.1</h2>
+    <p><strong>Mô hình nền tảng:</strong> Gemini 2.0 Flash</p>
+    <p><strong>Developer:</strong> Trần Tuấn Khang</p>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 <script>
-// === GIỮ NGUYÊN TOÀN BỘ LOGIC JS HIỆN TẠI ===
+// === GIỮ NGUYÊN LOGIC JS ===
 const API_KEY="AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU";
 const MODEL="gemini-2.0-flash";
 const endpoint=`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
@@ -289,6 +332,7 @@ const modeToggle=document.getElementById("modeToggle");
 const imgBtn=document.getElementById("imgBtn");
 const fileInput=document.getElementById("fileInput");
 let selectedImages=[];
+
 document.addEventListener("mousemove", e=>{
   const x = e.clientX/window.innerWidth*30;
   const y = e.clientY/window.innerHeight*30;
@@ -304,12 +348,14 @@ document.addEventListener("mousemove", e=>{
     b.style.setProperty('--shineY', `${cy}px`);
   });
 });
+
 function renderMessageContent(text){
   const container=document.createElement("div");
   container.innerHTML=marked.parse(text);
   container.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
   return container;
 }
+
 function addMessage(text,sender,isTyping=false,images=[]){
   const msg=document.createElement("div");
   msg.className=`message ${sender}`;
@@ -324,14 +370,28 @@ function addMessage(text,sender,isTyping=false,images=[]){
     img.onclick=()=>{selectedImages=selectedImages.filter(s=>s!==src); img.remove();};
     bubble.appendChild(img);
   });
-  bubble.appendChild(renderMessageContent(text));
-  if(isTyping) bubble.classList.add("typing");
+
+  if(isTyping && sender==="ai"){
+    const spinnerDiv=document.createElement("div");
+    spinnerDiv.className="ai-spinner";
+    const spinnerCircle=document.createElement("div");
+    spinnerCircle.className="spinner";
+    const spanText=document.createElement("span");
+    spanText.textContent="Processing...";
+    spinnerDiv.appendChild(spinnerCircle);
+    spinnerDiv.appendChild(spanText);
+    bubble.appendChild(spinnerDiv);
+  } else {
+    bubble.appendChild(renderMessageContent(text));
+  }
+
   msg.appendChild(bubble);
   messagesDiv.appendChild(msg);
   setTimeout(()=>msg.classList.add("show"),50);
   messagesDiv.scrollTop=messagesDiv.scrollHeight;
   return msg;
 }
+
 imgBtn.onclick=()=>fileInput.click();
 fileInput.onchange=e=>{
   Array.from(e.target.files).forEach(file=>{
@@ -350,12 +410,13 @@ document.addEventListener("paste",e=>{
     }
   }
 });
+
 async function sendMessage(){
   const text=input.value.trim();
   if(!text && selectedImages.length===0) return;
   addMessage(text||"📷 Ảnh","user",false,selectedImages);
   input.value="";
-  const typingMsg=addMessage("TTK AI đang gõ...","ai",true);
+  const typingMsg=addMessage("", "ai", true);
   try{
     const parts=[];
     selectedImages.forEach(img=>parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
@@ -371,10 +432,19 @@ async function sendMessage(){
   }
   selectedImages=[];
 }
+
 sendBtn.onclick=sendMessage;
 input.addEventListener("keypress",e=>{if(e.key==="Enter") sendMessage();});
 modeToggle.onclick=()=>document.body.classList.toggle("light");
 addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!","ai");
+
+// Info Modal Logic
+const infoBtn=document.getElementById("infoBtn");
+const infoModal=document.getElementById("infoModal");
+const closeModal=document.getElementById("closeModal");
+infoBtn.onclick=()=>infoModal.classList.add("show");
+closeModal.onclick=()=>infoModal.classList.remove("show");
+window.onclick=e=>{if(e.target===infoModal) infoModal.classList.remove("show");};
 </script>
 </body>
 </html>
