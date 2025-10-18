@@ -221,6 +221,7 @@ const imgBtn = document.getElementById("imgBtn");
 const fileInput = document.getElementById("fileInput");
 
 let selectedImages = [];
+let chatHistory = []; // Lưu lịch sử chat
 
 function renderMessageContent(text) {
   const container = document.createElement("div");
@@ -262,7 +263,7 @@ fileInput.onchange = e => {
     const reader = new FileReader();
     reader.onload = () => {
       selectedImages.push(reader.result);
-      addMessage("", "user", false, [reader.result]);
+      addMessage("📷 Ảnh", "user", false, [reader.result]);
     };
     reader.readAsDataURL(file);
   });
@@ -270,13 +271,13 @@ fileInput.onchange = e => {
 
 document.addEventListener("paste", e => {
   const items = e.clipboardData.items;
-  for (let i=0;i<items.length;i++) {
+  for (let i = 0; i < items.length; i++) {
     if (items[i].type.indexOf("image") !== -1) {
       const file = items[i].getAsFile();
       const reader = new FileReader();
       reader.onload = () => {
         selectedImages.push(reader.result);
-        addMessage("", "user", false, [reader.result]);
+        addMessage("📷 Ảnh", "user", false, [reader.result]);
       };
       reader.readAsDataURL(file);
     }
@@ -287,25 +288,32 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text && selectedImages.length === 0) return;
 
+  // Hiển thị tin nhắn người dùng
   addMessage(text || "📷 Ảnh", "user", false, selectedImages);
+  chatHistory.push({author: "user", content: text}); // lưu lịch sử chat
   input.value = "";
+
   const typingMsg = addMessage("TTK AI đang gõ...", "ai", true);
 
   try {
-    const parts = [];
-    selectedImages.forEach(img => parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
-    if(text) parts.push({text});
+    // Chỉ gửi text để tránh lỗi API
+    const messagesForAPI = chatHistory.map(m => ({
+      author: m.author,
+      content: [{text: m.content}]
+    }));
 
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({contents:[{parts}]})
+      body: JSON.stringify({ messages: messagesForAPI })
     });
 
     const data = await res.json();
     typingMsg.remove();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
+
+    const reply = data?.candidates?.[0]?.content?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
     addMessage(reply, "ai");
+    chatHistory.push({author: "assistant", content: reply}); // lưu phản hồi AI
   } catch(err) {
     typingMsg.remove();
     addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.", "ai");
@@ -318,7 +326,9 @@ sendBtn.onclick = sendMessage;
 input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
 modeToggle.onclick = () => document.body.classList.toggle("light");
 
-addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!", "ai");
+// Tin nhắn chào mừng
+addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn để mình giúp nhé!", "ai");
+chatHistory.push({author: "assistant", content: "Xin chào 👋! Mình là TTK AI – trợ lý ảo của bạn. Hãy gửi tin nhắn để mình giúp nhé!"});
 </script>
 </body>
 </html>
