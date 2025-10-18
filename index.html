@@ -221,7 +221,6 @@ const imgBtn = document.getElementById("imgBtn");
 const fileInput = document.getElementById("fileInput");
 
 let selectedImages = [];
-let chatHistory = []; // lưu toàn bộ hội thoại
 
 function renderMessageContent(text) {
   const container = document.createElement("div");
@@ -288,34 +287,25 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text && selectedImages.length === 0) return;
 
-  // Hiển thị tin nhắn người dùng
   addMessage(text || "📷 Ảnh", "user", false, selectedImages);
   input.value = "";
   const typingMsg = addMessage("TTK AI đang gõ...", "ai", true);
 
-  // Thêm tin nhắn người dùng vào lịch sử chat
-  const userContent = [];
-  selectedImages.forEach(img => userContent.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
-  if (text) userContent.push({text});
-  chatHistory.push({author: "user", content: userContent});
-
   try {
-    // Gửi toàn bộ lịch sử chat để AI hiểu ngữ cảnh
+    const parts = [];
+    selectedImages.forEach(img => parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
+    if(text) parts.push({text});
+
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({contents: chatHistory})
+      body: JSON.stringify({contents:[{parts}]})
     });
 
     const data = await res.json();
     typingMsg.remove();
-
-    const replyText = data?.candidates?.[0]?.content?.map(p => p.text).join("\n") || "⚠️ Không có phản hồi từ AI.";
-
-    addMessage(replyText, "ai");
-
-    // Lưu phản hồi AI vào lịch sử
-    chatHistory.push({author: "ai", content: [{text: replyText}]});
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
+    addMessage(reply, "ai");
   } catch(err) {
     typingMsg.remove();
     addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.", "ai");
@@ -328,7 +318,6 @@ sendBtn.onclick = sendMessage;
 input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
 modeToggle.onclick = () => document.body.classList.toggle("light");
 
-// Tin nhắn chào mừng
 addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!", "ai");
 </script>
 </body>
