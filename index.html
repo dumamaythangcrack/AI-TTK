@@ -10,11 +10,11 @@
     --bg-light: #f5f5f5;
     --text-dark: #c9d1d9;
     --text-light: #0d1117;
-    --accent: #238636;
-    --bubble-ai-dark: #21262d;
-    --bubble-user-dark: #238636;
+    --accent: #00c896;
+    --bubble-ai-dark: #1e2228;
+    --bubble-user-dark: #007c5c;
     --bubble-ai-light: #e9e9eb;
-    --bubble-user-light: #2ea043;
+    --bubble-user-light: #4bd37f;
   }
 
   body {
@@ -30,20 +30,19 @@
     overflow: hidden;
   }
 
-  /* Gradient nền động */
+  /* 🌈 Gradient nền động */
   body::before {
     content: "";
     position: absolute;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 20% 20%, #23863633, transparent),
+    width: 250%;
+    height: 250%;
+    background: radial-gradient(circle at 20% 20%, #00ff8844, transparent),
                 radial-gradient(circle at 80% 80%, #00ffff22, transparent),
-                radial-gradient(circle at 50% 50%, #ff007755, transparent);
-    filter: blur(80px);
-    animation: gradientMove 10s infinite alternate;
+                radial-gradient(circle at 60% 40%, #ff00aa33, transparent);
+    filter: blur(120px);
+    animation: gradientMove 15s infinite alternate;
     z-index: 0;
   }
-
   @keyframes gradientMove {
     0% { transform: translate(0,0); }
     100% { transform: translate(-10%, -10%); }
@@ -60,26 +59,22 @@
     border-radius: 20px;
     backdrop-filter: blur(15px);
     background: rgba(13, 17, 23, 0.7);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
     overflow: hidden;
   }
 
   .chat-header {
-    background: rgba(22, 27, 34, 0.9);
+    background: rgba(22, 27, 34, 0.85);
     padding: 18px;
     text-align: center;
     font-size: 1.6em;
-    font-weight: bold;
+    font-weight: 600;
     border-bottom: 1px solid #30363d;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-
-  .chat-header span {
-    font-size: 0.8em;
-    opacity: 0.7;
-  }
+  .chat-header span { font-size: 0.8em; opacity: 0.7; }
 
   .mode-toggle {
     background: none;
@@ -89,10 +84,7 @@
     cursor: pointer;
     transition: transform 0.3s;
   }
-
-  .mode-toggle:hover {
-    transform: rotate(20deg);
-  }
+  .mode-toggle:hover { transform: rotate(25deg); }
 
   .chat-messages {
     flex: 1;
@@ -100,19 +92,13 @@
     overflow-y: auto;
     scroll-behavior: smooth;
   }
-
   .chat-messages::-webkit-scrollbar { width: 8px; }
   .chat-messages::-webkit-scrollbar-thumb {
     background: var(--accent);
     border-radius: 10px;
   }
 
-  .message {
-    margin: 10px 0;
-    display: flex;
-    animation: fadeIn 0.4s ease;
-  }
-
+  .message { margin: 10px 0; display: flex; animation: fadeIn 0.4s ease; }
   .message.user { justify-content: flex-end; }
   .message.ai { justify-content: flex-start; }
 
@@ -125,49 +111,52 @@
     box-shadow: 0 3px 6px rgba(0,0,0,0.2);
   }
 
-  .user .bubble {
-    background: var(--bubble-user-dark);
-    color: white;
-    border-bottom-right-radius: 4px;
-  }
+  .user .bubble { background: var(--bubble-user-dark); color: white; border-bottom-right-radius: 4px; }
+  .ai .bubble { background: var(--bubble-ai-dark); color: var(--text-dark); border-bottom-left-radius: 4px; }
 
-  .ai .bubble {
-    background: var(--bubble-ai-dark);
-    color: var(--text-dark);
-    border-bottom-left-radius: 4px;
-  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .typing {
-    font-style: italic;
-    opacity: 0.8;
-  }
+  .typing { font-style: italic; opacity: 0.7; }
 
   .chat-input {
     display: flex;
     align-items: center;
-    padding: 10px;
-    background: rgba(22,27,34,0.9);
+    padding: 12px;
+    background: rgba(22,27,34,0.85);
     border-top: 1px solid #30363d;
   }
 
-  input {
+  input[type="text"] {
     flex: 1;
     padding: 12px;
     border: 1px solid #30363d;
     border-radius: 10px;
-    background: rgba(13,17,23,0.7);
+    background: rgba(13,17,23,0.6);
     color: var(--text-dark);
     font-size: 1em;
     outline: none;
   }
 
-  button.send-btn {
-    margin-left: 10px;
+  .file-input { display: none; }
+
+  .image-preview {
+    max-width: 160px;
+    max-height: 110px;
+    border-radius: 10px;
+    margin: 5px;
+    border: 1px solid #00c896;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: var(--accent);
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .send-btn {
     padding: 10px 18px;
     background: var(--accent);
     border: none;
@@ -177,47 +166,36 @@
     cursor: pointer;
     transition: background 0.3s;
   }
+  .send-btn:hover { background: #00e6a4; }
 
-  button.send-btn:hover { background: #2ea043; }
-
-  /* Light Mode */
-  body.light {
-    background: var(--bg-light);
-    color: var(--text-light);
-  }
-  body.light .chat-container {
-    background: rgba(255,255,255,0.8);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  }
-  body.light .chat-header { background: rgba(240,240,240,0.9); }
-  body.light .user .bubble {
-    background: var(--bubble-user-light);
-  }
-  body.light .ai .bubble {
-    background: var(--bubble-ai-light);
-    color: var(--text-light);
-  }
-  body.light input {
-    background: #fff;
-    color: #000;
-  }
+  /* 🌞 Light mode */
+  body.light { background: var(--bg-light); color: var(--text-light); }
+  body.light .chat-container { background: rgba(255,255,255,0.9); }
+  body.light .chat-header { background: rgba(245,245,245,0.9); }
+  body.light .user .bubble { background: var(--bubble-user-light); }
+  body.light .ai .bubble { background: var(--bubble-ai-light); color: var(--text-light); }
+  body.light input { background: #fff; color: #000; }
 </style>
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">
       🤖 TTK AI <span>Dev by Trần Tuấn Khang</span>
-      <button class="mode-toggle" title="Chuyển chế độ" id="modeToggle">🌓</button>
+      <button class="mode-toggle" id="modeToggle">🌓</button>
     </div>
+
     <div id="messages" class="chat-messages"></div>
+
     <div class="chat-input">
-      <input id="input" type="text" placeholder="Nhập tin nhắn...">
+      <button class="icon-btn" id="imgBtn">🖼️</button>
+      <input type="file" id="fileInput" class="file-input" accept="image/*">
+      <input id="input" type="text" placeholder="Nhập tin nhắn hoặc mô tả ảnh...">
       <button id="send" class="send-btn">Gửi</button>
     </div>
   </div>
 
   <script>
-    const API_KEY = "YOUR_GEMINI_KEY"; // Ghi key vào đây
+    const API_KEY = "AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU";
     const MODEL = "gemini-2.0-flash";
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
@@ -225,13 +203,22 @@
     const input = document.getElementById("input");
     const sendBtn = document.getElementById("send");
     const modeToggle = document.getElementById("modeToggle");
+    const imgBtn = document.getElementById("imgBtn");
+    const fileInput = document.getElementById("fileInput");
+    let selectedImage = null;
 
-    function addMessage(text, sender, isTyping = false) {
+    function addMessage(text, sender, isTyping = false, imgSrc = null) {
       const msg = document.createElement("div");
       msg.className = `message ${sender}`;
       const bubble = document.createElement("div");
       bubble.className = "bubble";
-      bubble.textContent = text;
+      if (imgSrc) {
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        img.className = "image-preview";
+        bubble.appendChild(img);
+      }
+      bubble.appendChild(document.createTextNode(text));
       if (isTyping) bubble.classList.add("typing");
       msg.appendChild(bubble);
       messagesDiv.appendChild(msg);
@@ -239,36 +226,63 @@
       return msg;
     }
 
+    imgBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          selectedImage = reader.result;
+          addMessage("📷 Ảnh đã chọn:", "user", false, selectedImage);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
     async function sendMessage() {
       const text = input.value.trim();
-      if (!text) return;
-      addMessage(text, "user");
-      input.value = "";
+      if (!text && !selectedImage) return;
 
+      addMessage(text || "Gửi ảnh", "user", false, selectedImage);
+      input.value = "";
       const typingMsg = addMessage("TTK AI đang gõ...", "ai", true);
 
       try {
+        const body = {
+          contents: [
+            {
+              parts: [
+                ...(selectedImage ? [{ inline_data: { mime_type: "image/png", data: selectedImage.split(",")[1] } }] : []),
+                { text }
+              ]
+            }
+          ]
+        };
+
         const res = await fetch(endpoint, {
           method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ contents: [{ parts: [{ text }] }] })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
         });
 
         const data = await res.json();
         typingMsg.remove();
         const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ Không có phản hồi từ AI.";
         addMessage(reply, "ai");
-      } catch {
+      } catch (err) {
         typingMsg.remove();
         addMessage("❌ Lỗi kết nối hoặc key không hợp lệ.", "ai");
       }
+
+      selectedImage = null;
     }
 
     sendBtn.onclick = sendMessage;
     input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
     modeToggle.onclick = () => document.body.classList.toggle("light");
 
-    addMessage("Xin chào 👋! Mình là **TTK AI**, trợ lý ảo của bạn. Hôm nay bạn cần mình giúp gì?", "ai");
+    addMessage("Xin chào 👋! Mình là **TTK AI** – trợ lý ảo của bạn. Hãy gửi tin nhắn hoặc ảnh để mình giúp nhé!", "ai");
   </script>
 </body>
 </html>
