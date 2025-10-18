@@ -215,8 +215,8 @@ window.addEventListener("load", ()=>{
 
 // === GIỮ NGUYÊN LOGIC JS CŨ ===
 const API_KEY="AIzaSyCrzfPbVtDLKBAsdKO31vdHysBb8JDQYUU";
-const MODEL="gemini-2.0-flash";
-const endpoint=`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+const MODEL="gemini-2.5-flash";
+const endpoint=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash${MODEL}:generateContent?key=${API_KEY}`;
 const messagesDiv=document.getElementById("messages");
 const input=document.getElementById("input");
 const sendBtn=document.getElementById("send");
