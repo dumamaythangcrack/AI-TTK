@@ -242,9 +242,12 @@ document.addEventListener("mousemove", e=>{
 });
 
 function renderMessageContent(text){
-  const container=document.createElement("div");
-  container.innerHTML=marked.parse(text);
-  container.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));
+  const container = document.createElement("div");
+  // Thay vì parse Markdown, giữ nguyên ký tự
+container.innerHTML = text
+  .replace(/(\/\/.*)/g, '<span style="color:#aaa;font-size:0.85em;">$1</span>')
+  .replace(/\n/g, "<br>")
+  .replace(/ /g, "&nbsp;");
   return container;
 }
 
@@ -309,6 +312,9 @@ async function sendMessage(){
   addMessage(text||"📷 Ảnh","user",false,selectedImages);
   input.value="";
   const typingMsg=addMessage("", "ai", true);
+  if(text) parts.push({
+  text: "Viết trực tiếp các ký tự toán học và số, không dùng LaTeX. Nếu cần, thêm chú thích sau //."
+});
   try{
     const parts=[];
     selectedImages.forEach(img=>parts.push({inline_data:{mime_type:"image/png",data:img.split(",")[1]}}));
